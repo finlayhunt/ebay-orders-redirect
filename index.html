@@ -41,8 +41,8 @@
         <div class="spinner"></div>
         <h2>eBay Orders</h2>
         <p>Authorization successful!</p>
-        <p>Please return to the eBay Orders app.</p>
-        <p><small>You can close this window now.</small></p>
+        <p>Redirecting back to app...</p>
+        <p><small>If you're not redirected automatically, please return to the app.</small></p>
     </div>
 
     <script>
@@ -53,11 +53,33 @@
         
         if (code) {
             console.log('Authorization code received:', code);
-            // Show success message
-            document.querySelector('p').textContent = 'Authorization successful! Please return to the app.';
+            
+            // Try to redirect back to the app with the code
+            setTimeout(() => {
+                // Try different methods to redirect back to the app
+                try {
+                    // Method 1: Try to open the app with a custom URL scheme
+                    window.location.href = 'ebayorders://auth-callback?code=' + code;
+                } catch (e) {
+                    console.log('Custom URL scheme failed:', e);
+                    
+                    // Method 2: Try to open the app with a different scheme
+                    try {
+                        window.location.href = 'com.FinlayHunt.eBayOrders://auth-callback?code=' + code;
+                    } catch (e2) {
+                        console.log('Alternative URL scheme failed:', e2);
+                        
+                        // Method 3: Show manual instructions
+                        document.querySelector('p').textContent = 'Please return to the eBay Orders app and try again.';
+                    }
+                }
+            }, 2000);
+            
         } else if (error) {
             console.log('Authorization error:', error);
             document.querySelector('p').textContent = 'Authorization failed. Please try again.';
+        } else {
+            document.querySelector('p').textContent = 'No authorization code found. Please try again.';
         }
     </script>
 </body>
