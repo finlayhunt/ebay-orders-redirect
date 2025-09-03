@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>eBay Orders - Redirecting...</title>
+    <title>eBay Orders - Authorization Code</title>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <style>
@@ -20,29 +20,47 @@
             background: white;
             border-radius: 10px;
             box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            max-width: 500px;
         }
-        .spinner {
-            border: 3px solid #f3f3f3;
-            border-top: 3px solid #007bff;
-            border-radius: 50%;
-            width: 40px;
-            height: 40px;
-            animation: spin 1s linear infinite;
-            margin: 0 auto 1rem;
+        .code-box {
+            background: #f8f9fa;
+            border: 2px solid #007bff;
+            border-radius: 8px;
+            padding: 1rem;
+            margin: 1rem 0;
+            font-family: monospace;
+            word-break: break-all;
         }
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
+        .copy-btn {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 0.5rem;
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <div class="spinner"></div>
         <h2>eBay Orders</h2>
         <p>Authorization successful!</p>
-        <p>Redirecting back to app...</p>
-        <p><small>If you're not redirected automatically, please return to the app.</small></p>
+        
+        <div class="code-box" id="codeBox">
+            <strong>Authorization Code:</strong><br>
+            <span id="authCode">Loading...</span>
+        </div>
+        
+        <button class="copy-btn" onclick="copyCode()">Copy Code</button>
+        
+        <p><strong>Instructions:</strong></p>
+        <ol style="text-align: left; max-width: 400px; margin: 0 auto;">
+            <li>Copy the authorization code above</li>
+            <li>Return to the eBay Orders app</li>
+            <li>Paste the code in the Settings screen</li>
+            <li>Tap "Complete Authentication"</li>
+        </ol>
     </div>
 
     <script>
@@ -52,34 +70,18 @@
         const error = urlParams.get('error');
         
         if (code) {
-            console.log('Authorization code received:', code);
-            
-            // Try to redirect back to the app with the code
-            setTimeout(() => {
-                // Try different methods to redirect back to the app
-                try {
-                    // Method 1: Try to open the app with a custom URL scheme
-                    window.location.href = 'ebayorders://auth-callback?code=' + code;
-                } catch (e) {
-                    console.log('Custom URL scheme failed:', e);
-                    
-                    // Method 2: Try to open the app with a different scheme
-                    try {
-                        window.location.href = 'com.FinlayHunt.eBayOrders://auth-callback?code=' + code;
-                    } catch (e2) {
-                        console.log('Alternative URL scheme failed:', e2);
-                        
-                        // Method 3: Show manual instructions
-                        document.querySelector('p').textContent = 'Please return to the eBay Orders app and try again.';
-                    }
-                }
-            }, 2000);
-            
+            document.getElementById('authCode').textContent = code;
         } else if (error) {
-            console.log('Authorization error:', error);
-            document.querySelector('p').textContent = 'Authorization failed. Please try again.';
+            document.getElementById('authCode').textContent = 'Error: ' + error;
         } else {
-            document.querySelector('p').textContent = 'No authorization code found. Please try again.';
+            document.getElementById('authCode').textContent = 'No authorization code found';
+        }
+        
+        function copyCode() {
+            const code = document.getElementById('authCode').textContent;
+            navigator.clipboard.writeText(code).then(() => {
+                alert('Code copied to clipboard!');
+            });
         }
     </script>
 </body>
